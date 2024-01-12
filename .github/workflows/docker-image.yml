@@ -13,6 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # configure git to use SSH key for private repos
+    - uses: webfactory/ssh-agent@v0.5.1 
+      with:
+        ssh-private-key: |
+              ${{ secrets.EDGEBOTIC_AMR_SSH_PRIVATE_KEY }}
+              ${{ secrets.ROS2_CONTROL_EDGEBOTIC_AMR_SSH_PRIVATE_KEY }}
     - uses: actions/checkout@v3
       with:
         lfs: true
@@ -39,7 +45,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the Docker image
       run: |
-        PLATFORM=aarch64 docker build -t bshibley/edgebotic_amr_ros-aarch64 -f ./Dockerfile .
+        PLATFORM=aarch64 docker build -t edgebotic_amr_ros-aarch64 -f ./Dockerfile .
     - name: Tag & push the image
       run: |
         DATESTAMP=$(date +%s)
