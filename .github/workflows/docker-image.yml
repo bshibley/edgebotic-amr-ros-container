@@ -22,7 +22,7 @@ jobs:
     - name: Get current date
       id: date
       run: |
-        echo "{datestamp}={$(date +%s)}" >> $GITHUB_STATE
+        echo "{datestamp}={$(date +%s)}" >> $GITHUB_ENV
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       with:
