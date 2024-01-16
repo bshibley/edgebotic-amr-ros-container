@@ -1,10 +1,6 @@
 name: Docker Image CI
 
-on:
-  push:
-    branches: [ "serial-ros2" ]
-  pull_request:
-    branches: [ "serial-ros2" ]
+on: [push, pull_request]
 
 jobs:
 
@@ -23,6 +19,10 @@ jobs:
       with:
         lfs: true
         submodules: 'recursive'
+    - name: Get current date
+      id: date
+      run: |
+        echo "{datestamp}={$(date +%s)}" >> $GITHUB_STATE
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       with:
@@ -32,11 +32,22 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Build the Docker image
-      run: |
-        PLATFORM=aarch64 docker build -t edgebotic_amr_ros-aarch64 -f ./Dockerfile .
-    - name: Tag & push the image
-      run: |
-        DATESTAMP=$(date +%s)
-        docker tag edgebotic_amr_ros-aarch64:latest ${{ secrets.DOCKERHUB_USERNAME }}/edgebotic_amr_ros-aarch64:ros2-serial-${DATESTAMP}
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/edgebotic_amr_ros-aarch64:ros2-serial-${DATESTAMP}
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1 
+    - name: Cache register
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile') }}
+    - name: Build Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./
+        platforms: linux/arm64
+        file: ./Dockerfile
+        builder: ${{ steps.buildx.outputs.name }}
+        load: true
+        tags: edgebotic_amr_ros-aarch64:${{ env.datestamp }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
