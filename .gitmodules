@@ -4,6 +4,6 @@
 [submodule "workspace/src/edgebotic_amr"]
 	path = workspace/src/edgebotic_amr
 	url = git@github.com:bshibley/edgebotic_amr.git
-[submodule "workspace/src/serial"]
-	path = workspace/src/serial
-	url = https://github.com/joshnewans/serial
+[submodule "workspace/src/serial-ros2"]
+	path = workspace/src/serial-ros2
+	url = https://github.com/RoverRobotics-forks/serial-ros2
