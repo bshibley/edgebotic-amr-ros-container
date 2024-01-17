@@ -9,6 +9,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # true => removed from image
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
       # configure git to use SSH key for private repos
     - uses: webfactory/ssh-agent@v0.5.1 
       with:
@@ -19,10 +30,6 @@ jobs:
       with:
         lfs: true
         submodules: 'recursive'
-    - name: Get current date
-      id: date
-      run: |
-        echo "{datestamp}={$(date +%s)}" >> $GITHUB_ENV
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       with:
@@ -40,6 +47,13 @@ jobs:
       with:
         path: /tmp/.buildx-cache
         key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile') }}
+    - name: Docker timestamp metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ secrets.DOCKERHUB_USERNAME }}/edgebotic_amr_ros-aarch64
+        tags: |
+          type=raw,value={{date 'X'}}
     - name: Build Docker image
       uses: docker/build-push-action@v5
       with:
@@ -47,7 +61,7 @@ jobs:
         platforms: linux/arm64
         file: ./Dockerfile
         builder: ${{ steps.buildx.outputs.name }}
-        load: true
-        tags: edgebotic_amr_ros-aarch64:${{ env.datestamp }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
