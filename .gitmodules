@@ -7,3 +7,6 @@
 [submodule "workspace/src/serial-ros2"]
 	path = workspace/src/serial-ros2
 	url = https://github.com/bshibley/serial-ros2.git
+[submodule "workspace/src/adxl345_imu_broadcaster"]
+	path = workspace/src/adxl345_imu_broadcaster
+	url = https://github.com/bshibley/adxl345_imu_broadcaster.git
