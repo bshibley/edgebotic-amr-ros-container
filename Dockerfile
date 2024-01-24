@@ -7,7 +7,7 @@ COPY workspace/src src
 # Install dependencies
 RUN source /workspace/install/setup.bash && apt-get update && \
     rosdep install --from-paths src --ignore-src --rosdistro humble -y && \
-    apt-get install ros-humble-teleop-twist-keyboard picocom -y && \
+    apt-get install ros-humble-teleop-twist-keyboard picocom libi2c-dev -y && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
